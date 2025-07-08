@@ -226,11 +226,14 @@ Authorization: Bearer <your_auth_token>
 
 ### Environment Variables
 
-| Variable                | Description                         | Required |
-| ----------------------- | ----------------------------------- | -------- |
-| `AZURE_OPENAI_API_KEY`  | Azure OpenAI API key                | Yes      |
-| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL           | Yes      |
-| `AUTH_TOKEN`            | Bearer token for API authentication | Yes      |
+| Variable                           | Description                         | Required |
+| ---------------------------------- | ----------------------------------- | -------- |
+| `AZURE_OPENAI_API_KEY`             | Azure OpenAI API key                | Yes      |
+| `AZURE_OPENAI_ENDPOINT`            | Azure OpenAI endpoint URL           | Yes      |
+| `AUTH_TOKEN`                       | Bearer token for API authentication | Yes      |
+| `AZURE_OPENAI_API_VERSION`         | Azure OpenAI API version            | Yes      |
+| `AZURE_OPENAI_TRANSCRIPTION_MODEL` | Azure OpenAI transcription model    | Yes      |
+| `AZURE_OPENAI_COMPLETION_MODEL`    | Azure OpenAI chat completion model  | Yes      |
 
 ### Directory Structure
 

@@ -319,7 +319,7 @@ def create_subtitles_with_ffmpeg(transcript_segments: list, clip_start: float, c
     new_style.alignment = 2  # Bottom center
     new_style.marginl = 50
     new_style.marginr = 50
-    new_style.marginv = 50
+    new_style.marginv = 200
     new_style.spacing = 0.0
     new_style.bold = True
 
@@ -509,7 +509,7 @@ class AiVideoClipper:
 
         self.openai_client = AzureOpenAI(
             api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            api_version="2024-06-01",
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
         )
 
@@ -528,12 +528,13 @@ class AiVideoClipper:
         print("Starting transcription with Whisper...")
         start_time = time.time()
 
-        result = self.openai_client.audio.transcriptions.create(
-            file=open(audio_path, "rb"),
-            model="clloh-n8n-whisper",
-            response_format="verbose_json",
-            timestamp_granularities=["segment"]
-        )
+        with open(audio_path, "rb") as audio_file:
+            result = self.openai_client.audio.transcriptions.create(
+                file=audio_file,
+                model=os.getenv("AZURE_OPENAI_TRANSCRIPTION_MODEL"),
+                response_format="verbose_json",
+                timestamp_granularities=["word"]
+            )
 
         duration = time.time() - start_time
         print("Transcription and alignment took " + str(duration) + " seconds")
@@ -541,13 +542,12 @@ class AiVideoClipper:
         # Extract word-level segments
         segments = []
         
-        if hasattr(result, 'segments') and result.segments:
-            print(f"No words found, using {len(result.segments)} segments")
-            for segment in result.segments:
+        if hasattr(result, 'words') and result.words:
+            for item in result.words:
                 segments.append({
-                    "start": segment.start,
-                    "end": segment.end,
-                    "word": segment.text,
+                    "start": item.start,
+                    "end": item.end,
+                    "word": item.word,
                 })
     
         # Fallback - use full text as single segment
@@ -596,7 +596,7 @@ class AiVideoClipper:
         The transcript is as follows:\n\n""" + str(transcript)
 
         response = self.openai_client.chat.completions.create(
-            model="clloh-n8n-gpt-4.1-mini",
+            model=os.getenv("AZURE_OPENAI_COMPLETION_MODEL"),
             messages=[
                 {
                     "role": "user",
